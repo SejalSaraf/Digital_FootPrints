@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Chatbot Button */
+        .chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: white;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .chatbot-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Chatbot Container */
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            height: 340px;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Input Section */
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background: #f9f9f9;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+            margin-bottom: 8px;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #f1f1f1;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chatbot Icon -->
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="Chatbot Icon" class="chatbot-icon" onclick="toggleChat()">
+
+    <!-- Chatbot Container -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">Cybersecurity Chatbot</div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Ask about cybersecurity..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const chatContainer = document.getElementById("chatContainer");
+            chatContainer.style.display = (chatContainer.style.display === "none" || chatContainer.style.display === "") ? "flex" : "none";
+        }
+
+        const responses = {
+            // Greetings
+            "hi": "Hello! How can I assist you with cybersecurity?",
+            "hello": "Hi there! Ask me anything about security.",
+            "how are you": "I'm here and ready to help with cybersecurity-related queries.",
+
+            // Cybersecurity FAQs
+            "how can i check if my email has been breached": "You can use our breach detection tool to scan databases for leaked credentials.",
+            "what should i do if my data is found in a breach": "Change your passwords immediately, enable two-factor authentication, and monitor for suspicious activity.",
+            "what is dark web monitoring": "It scans dark web forums and marketplaces for leaked credentials and compromised accounts.",
+            "how do i know if my credentials are on the dark web": "Our system checks databases and alerts you if any of your data is found.",
+            "how is my privacy score calculated": "It considers data breaches, trackers, cookies, VPN usage, and account security levels.",
+            "how can i improve my privacy score": "Use strong passwords, enable 2FA, clear cookies, and use a secure browser.",
+            "what is the best way to secure my accounts": "Use a password manager, enable multi-factor authentication, and avoid phishing links.",
+            "how do i know if a website is tracking me": "You can use our website privacy scanner to check for tracking cookies and fingerprinting scripts.",
+            "do i need a vpn for better privacy": "Yes, a VPN hides your IP address and encrypts your traffic, improving online security.",
+            "how do i know if i’m being tracked": "Our scanner can detect tracking cookies and scripts used by websites.",
+            "what are common signs of phishing": "Fake emails, urgent messages, suspicious links, and requests for sensitive information.",
+            "how can i protect myself from malware": "Keep software updated, use antivirus software, and avoid downloading unverified files.",
+            "what is two-factor authentication": "2FA adds an extra layer of security by requiring a second step, like a code sent to your phone.",
+            "is public wifi safe": "Not always! Use a VPN or avoid accessing sensitive accounts on public networks.",
+            "how can i create a strong password": "Use at least 12 characters, mix letters, numbers, symbols, and avoid common words.",
+            "what is ransomware": "Ransomware is malware that locks your files and demands payment to unlock them.",
+            "how do hackers steal passwords": "Through phishing, keyloggers, data breaches, and weak passwords.",
+
+            // Default Response
+            "default": "I can help with cybersecurity-related topics. Try asking about breaches, privacy, or security tips."
+        };
+
+        function sendMessage() {
+            const userInput = document.getElementById("userInput").value.trim().toLowerCase();
+            if (userInput === "") return;
+
+            appendMessage("You: " + userInput, "user-message");
+
+            let botResponse = responses[userInput] || responses["default"];
+
+            setTimeout(() => appendMessage("Bot: " + botResponse, "bot-message"), 500);
+
+            document.getElementById("userInput").value = "";
+        }
+
+        function appendMessage(text, className) {
+            const chatMessages = document.getElementById("chatMessages");
+            const messageElement = document.createElement("div");
+            messageElement.textContent = text;
+            messageElement.classList.add("message", className);
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+    </script>
+
+</body>
+</html>
